@@ -1,0 +1,159 @@
+---
+title: "Assignment_1"
+author: "Yuying Cheng"
+format: 
+  html:
+    embed-resources: true
+    standalone: true
+editor: visual
+---
+
+```{r setup}
+#| echo: fenced
+#| message: false
+#| warning: false
+
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(tidyverse)
+library(stringr)
+library(RColorBrewer)
+
+set_style <- function(p){
+  return(p + scale_fill_brewer(palette="Paired"))
+}
+
+```
+
+# Task 4 - R basic operations
+
+```{r task 4}
+sqrt(10)
+
+```
+
+```{r}
+log2(32)
+```
+
+```{r}
+sum <- 0
+for (i in seq(1, 1000)){
+  sum <- sum + i
+}
+sum
+```
+
+```{r}
+sum <- 0
+for (i in seq(2, 1000, 2)){
+  sum <- sum + i
+}
+sum
+```
+
+```{r}
+choose(100, 2)
+```
+
+```{r}
+choose(100, 3)
+```
+
+# Task 5 - Using R example datasets
+
+```{r CO2}
+#| tbl-cap: CO2
+#| tbl-subcap: ["Data", "Uptake statistics"]
+#| layout-ncol: 2
+
+data(CO2)
+#help(CO2)
+
+head(CO2) %>%
+  kbl() %>%
+  kable_styling()
+
+CO2 %>%
+  group_by(Type) %>%
+  summarise(median = median(uptake), average = mean(uptake)) %>%
+  kbl() %>%
+  kable_styling()
+```
+
+```{r airway}
+#| layout-ncol: 2
+#| message: false
+#| warning: false
+#| cache: true
+
+library(airway)
+data(airway)
+expressed_no <- list(
+  expressed = ~sum(.x > 0),
+  not_expressed = ~sum(.x == 0)
+)
+df <- as.data.frame(assay(airway)) %>% 
+  summarise(
+    across(
+      where(is.numeric), 
+      expressed_no, 
+      .names = "{.col}.{.fn}")) %>%
+  gather(condition, count) %>% 
+  mutate(category = str_extract(condition, "expressed|not_expressed"),
+         condition = str_remove(condition, ".expressed|.not_expressed")) 
+df %>%
+  kbl() %>%
+  kable_styling()
+p <- ggplot(df, aes(x = condition, y = count, fill = category)) + geom_bar(stat = "identity") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+set_style(p)
+```
+
+# Task 6 - R Functions
+
+```{r}
+#Calculates the ratio of mean and median of a given vector
+#input: a numeric vector
+#output: the ratio of mean and median of the vector
+r_mean_median <- function(v){
+  return(mean(v)/median(v))
+}
+
+v <- list(normal = rnorm(10000, mean = 1),
+          exp = rexp(10000, rate = 1))
+hist(v$normal, breaks = 100)
+hist(v$exp, breaks = 100)
+lapply(v, r_mean_median)
+```
+
+```{r}
+#Calculates mean of a vectore after removing *one* maximum and *one* minimum
+#input: a vector
+#output: mean value after removal of one maximum and one minimum
+adjusted_average <- function(v){
+  x = sum(v) - min(v) - max(v)
+  return(x/(length(v)-2))
+}
+
+v = c(seq(1,3), rep(10,3))
+v
+adjusted_average(v)
+
+```
+
+## Pipes
+
+Pipe is a tool predominantly for a linear sequence of operations. To use it, connection the operations with "%\>%". However because of its design, there are several situations when it is not appropriate to use pipe, including:
+
+1.  when the number of operations is too large, piping makes it hard to debug.
+2.  when there are multiple inputs and outputs.
+3.  when there's a non-linear dependency structure of the operations.
+
+## Apply family
+
+The apply family is designed to replace the use of loops when it fits. In my work, the apply family is handy when i have several data sets but all subjected to the same pre-processing processes. For example, when i want to get the read counts from bigwig files, instead of writing loops I can lump the sets into a list and use lapply so I transform each bigwig file into a read count matrix with one line of code.
+
+# Task 7
