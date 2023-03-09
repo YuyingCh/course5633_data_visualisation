@@ -21,12 +21,13 @@ library(tidyverse)
 library(stringr)
 library(RColorBrewer)
 
+fixed_palette <- "Dark2"
 set_style <- function(p){
   return(p +  
            theme_classic() +
-           theme(legend.position="top") + 
-           scale_color_brewer(palette="Dark2")+
-           scale_fill_brewer(palette="Dark2"))
+           theme(legend.position = "top") + 
+           scale_color_brewer(palette = fixed_palette)+
+           scale_fill_brewer(palette = fixed_palette))
 }
 
 ```
@@ -68,6 +69,8 @@ choose(100, 3)
 
 # Task 5 - Using R example datasets
 
+`CO2` is data frame contains data from an experiment on cold tolerance of the grass species Echinochloa crus-galli. The experiment subjects are 6 plants originated either from Quebec or Mississippi. Their CO~2~ uptake rate was measured at several levels of ambient CO~2~ , with 2 treatment conditions - chilled and not chilled before the measurement.
+
 ```{r CO2}
 #| tbl-cap: CO2
 #| tbl-subcap: ["Data", "Uptake statistics"]
@@ -91,6 +94,7 @@ CO2 %>%
 #| layout-nrow: 1
 #| message: false
 #| warning: false
+#| cache: true
 
 library(airway)
 data(airway)
@@ -161,7 +165,7 @@ Pipe is a tool predominantly for a linear sequence of operations. To use it, con
 
 The apply family is designed to replace the use of loops when it fits. In my work, the apply family is handy when i have several data sets but all subjected to the same pre-processing processes. For example, when i want to get the read counts from bigwig files, instead of writing loops I can lump the sets into a list and use `lapply` so I transform each bigwig file into a read count matrix with one line of code.
 
-# Task 7
+# Task 7 - Basic visualization
 
 ```{r magic_guys}
 
@@ -234,10 +238,10 @@ set_na <- gene_na %>%
   filter(count == nrow(df))
   
 p1 + 
-  geom_point(data = set_10, color = brewer.pal(4, "Dark2")[1], alpla = 0.4) +
-  geom_point(data = set_20, color = brewer.pal(4, "Dark2")[2], alpha = 0.6) +
-  geom_point(data = set_50, color = brewer.pal(4, "Dark2")[3], alpha = 0.8) +
-  geom_point(data = set_na, color = brewer.pal(4, "Dark2")[4]) +
+  geom_point(data = set_10, color = brewer.pal(4, fixed_palette)[1], alpla = 0.4) +
+  geom_point(data = set_20, color = brewer.pal(4, fixed_palette)[2], alpha = 0.6) +
+  geom_point(data = set_50, color = brewer.pal(4, fixed_palette)[3], alpha = 0.8) +
+  geom_point(data = set_na, color = brewer.pal(4, fixed_palette)[4]) +
   geom_hline(yintercept = c(0.1, 0.2, 0.5, 1) * nrow(df), color = "grey40", linetype = "dashed") 
 ```
 
@@ -252,5 +256,37 @@ df_imputed[1:8, 1:6]
 ```
 
 ```{r CO2 visualisation}
-CO2
+#| warning: false
+#| message: false
+#| layout-ncol: 3
+
+getPallete <- colorRampPalette(brewer.pal(8, fixed_palette))
+N_color <- length(unique(CO2$Plant))
+p1<- ggplot(CO2, aes(x = Treatment, y = uptake, fill = Plant)) +
+  geom_boxplot() 
+set_style(p1) + scale_fill_manual(values = getPallete(N_color)) 
+p2 <- ggplot(CO2, aes(x = conc, y = uptake, color = Treatment)) +
+  geom_point() +
+  geom_smooth(method = "loess", fill = NA) +
+  facet_grid(Type ~ .)
+set_style(p2)
+p3 <- ggplot(CO2, aes(x = conc, y = uptake, color = Type)) +
+  geom_point() +
+  geom_smooth(method = "loess", fill = NA) +
+  facet_grid(Treatment ~ .)
+set_style(p3)
+```
+
+From the above plots I noticed the following:
+
+1.  From the boxplot, plants from Quebec have a higher CO~2~ uptake rate than Mississippi, whether they were chilled or not before the measurement.
+2.  Comparing the treatments, chilling decreases the CO~2~ uptake rate in general.
+3.  From the second and the third plot, we can learn the relationship between ambient CO~2~ level(conc) and the CO~2~ uptake rate of the plants. This relationship among all these plants demonstates a similar trend, i.e. the CO~2~ uptake rate increases as the level of conc increases, with a deceasing rate of change, and eventually reaches a plateau.
+4.  Whether or not chilled before measurement affects(decreases the uptake rate) the plants from Mississippi more than Quebec.
+
+# Task 8 
+
+```{r Tidybiology}
+library(tidybiology)
+chromosome
 ```
