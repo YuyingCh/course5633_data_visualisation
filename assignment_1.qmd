@@ -5,6 +5,7 @@ format:
   html:
     embed-resources: true
     standalone: true
+  pdf: default
 editor: visual
 ---
 
@@ -72,13 +73,9 @@ choose(100, 3)
 `CO2` is data frame contains data from an experiment on cold tolerance of the grass species Echinochloa crus-galli. The experiment subjects are 6 plants originated either from Quebec or Mississippi. Their CO~2~ uptake rate was measured at several levels of ambient CO~2~ , with 2 treatment conditions - chilled and not chilled before the measurement.
 
 ```{r CO2}
-#| tbl-cap: CO2
-#| tbl-subcap: ["Data", "Uptake statistics"]
 #| layout-ncol: 2
 
 data(CO2)
-#help(CO2)
-
 head(CO2) %>%
   kbl() %>%
   kable_styling()
@@ -225,6 +222,8 @@ set_style(p2)
 ```
 
 ```{r find genes}
+#| warning: false
+#| message: false
 set_10 <- gene_na %>% 
   filter(count > nrow(df) * 0.1) %>%
   mutate(category = ">10%") 
@@ -281,12 +280,53 @@ From the above plots I noticed the following:
 
 1.  From the boxplot, plants from Quebec have a higher CO~2~ uptake rate than Mississippi, whether they were chilled or not before the measurement.
 2.  Comparing the treatments, chilling decreases the CO~2~ uptake rate in general.
-3.  From the second and the third plot, we can learn the relationship between ambient CO~2~ level(conc) and the CO~2~ uptake rate of the plants. This relationship among all these plants demonstates a similar trend, i.e. the CO~2~ uptake rate increases as the level of conc increases, with a deceasing rate of change, and eventually reaches a plateau.
+3.  From the second and the third plot, we can learn the relationship between ambient CO~2~ level(conc) and the CO~2~ uptake rate of the plants. This relationship of the plants demonstates a similar trend, i.e. CO~2~ uptake rate increases as the level of conc increases, with a deceasing rate of change, and eventually reaches a plateau.
 4.  Whether or not chilled before measurement affects(decreases the uptake rate) the plants from Mississippi more than Quebec.
 
-# Task 8 
+# Task 8
 
 ```{r Tidybiology}
 library(tidybiology)
-chromosome
+colnames(chromosome) 
+chromosome %>% select(c("variations", "protein_codinggenes", "mi_rna")) %>%
+  summarise_all(.funs = list(mean = mean, median = median, max = max),
+                .names = "{.col}.{.fn}") %>%
+  gather(key = "statistics") %>%
+  kbl() %>%
+  kable_styling()
+```
+
+```{r chromosome size distribution}
+p <- ggplot(chromosome, aes(x = id, y = length_mm)) + 
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = length_mm), vjust = 1.6, color = "white", size = 3)
+set_style(p)
+```
+
+```{r length genes miRNA}
+#| layout-nrow: 1
+#| warning: false
+#| messages: false
+p1 <- ggplot(chromosome, aes(x = length_mm, y = protein_codinggenes)) +
+  geom_smooth(method = "lm") +
+  geom_point() 
+set_style(p1)
+p2 <- ggplot(chromosome, aes(x = length_mm, y = mi_rna)) +
+  geom_smooth(method = "lm") +
+  geom_point() 
+set_style(p2)
+```
+
+```{r proteins}
+#| layout-nrow: 1
+
+proteins %>% select(c("length", "mass")) %>%
+  summarise_all(.funs = list(mean = mean, median = median, max = max),
+                .names = "{.col}.{.fn}") %>%
+  gather(key = "statistics") %>%
+  kbl() %>%
+  kable_styling()
+p <- ggplot(proteins, aes(x = length, y = mass)) +
+  geom_point()
+set_style(p)
 ```
