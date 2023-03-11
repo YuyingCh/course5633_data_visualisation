@@ -70,7 +70,11 @@ choose(100, 3)
 
 # Task 5 - Using R example datasets
 
+## Describe briefly the content of the CO2 dataset using the help function.
+
 `CO2` is data frame contains data from an experiment on cold tolerance of the grass species Echinochloa crus-galli. The experiment subjects are 6 plants originated either from Quebec or Mississippi. Their CO~2~ uptake rate was measured at several levels of ambient CO~2~ , with 2 treatment conditions - chilled and not chilled before the measurement.
+
+## What is the average and median CO2 uptake of the plants from Quebec and Mississippi?
 
 ```{r CO2}
 #| layout-ncol: 2
@@ -86,6 +90,8 @@ CO2 %>%
   kbl() %>%
   kable_styling()
 ```
+
+## In the "airway" example data from Bioconductor, how many genes are expressed in each sample? How many genes are not expressed in any sample?
 
 ```{r airway}
 #| layout-nrow: 1
@@ -116,6 +122,8 @@ set_style(p) +
 
 # Task 6 - R Functions
 
+## Write a function that calculates the ratio of the mean and the median of a given vector.
+
 ```{r mean-median ratio}
 #| layout-nrow: 2
 
@@ -133,6 +141,8 @@ hist(v$normal, breaks = 100)
 hist(v$exponential, breaks = 100)
 lapply(v, r_mean_median)
 ```
+
+## Write a function that ignores the lowest and the highest value from a given vector and calculate the mean.
 
 ```{r adjusted average}
 #Calculates mean of a vectore after removing *one* maximum and *one* minimum
@@ -163,6 +173,8 @@ Pipe is a tool predominantly for a linear sequence of operations. To use it, con
 The apply family is designed to replace the use of loops when it fits. In my work, the apply family is handy when i have several data sets but all subjected to the same pre-processing processes. For example, when i want to get the read counts from bigwig files, instead of writing loops I can lump the sets into a list and use `lapply` so I transform each bigwig file into a read count matrix with one line of code.
 
 # Task 7 - Basic visualization
+
+## Compare the distributions of the body heights of the two species from the 'magic_guys.csv' dataset graphically.
 
 ```{r magic_guys}
 
@@ -198,11 +210,17 @@ names(plots) <- c("gg_hist.png", "gg_box.png")
 lapply(names(plots), function(x) ggsave(x, plots[[x]]))
 ```
 
+## Load the gene expression data matrix from the 'microarray_data.tab' dataset provided in the shared folder, it is a big tabular separated matrix.
+
+1.  How big is the matrix in terms of rows and columns?
+
 ```{r microarray_data}
 df <- read.table("microarray_data.tab", sep = "\t", header = T)
 size_sum(df)
 
 ```
+
+2.  Count the missing values per gene and visualize this result.
 
 ```{r na counts}
 #| layout-nrow: 1
@@ -220,6 +238,8 @@ p2 <- ggplot(gene_na, aes(x = count)) +
   geom_density()
 set_style(p2)
 ```
+
+3.  Find the genes for which there are more than X% (X=10%, 20%, 50%) missing values.
 
 ```{r find genes}
 #| warning: false
@@ -244,6 +264,8 @@ p1 +
   geom_hline(yintercept = c(0.1, 0.2, 0.5, 1) * nrow(df), color = "grey40", linetype = "dashed") 
 ```
 
+4.  Replace the missing values by the average expression value for the particular gene. (Note: Imputing data has to be used with caution!)
+
 ```{r Imputation}
 replace_with_mean <- function(v){
   v[is.na(v)] <- mean(v, na.rm = T)
@@ -253,6 +275,8 @@ df_imputed <- df %>%
   mutate(across(where(is.numeric), ~replace_na(., mean(., na.rm = T))))
 df_imputed[1:8, 1:6]
 ```
+
+## Visualize the data in the CO2 dataset in a way that gives you a deeper understanding of the data. What do you see?
 
 ```{r CO2 visualisation}
 #| warning: false
@@ -285,16 +309,22 @@ From the above plots I noticed the following:
 
 # Task 8
 
+## Install the Tidybiology package, which includes the data 'chromosome' and 'proteins'.
+
+1.  Extract summary statistics (mean, median and maximum) for the following variables from the 'chromosome' data: variations, protein coding genes, and miRNAs. Utilize the tidyverse functions to make this as simply as possible.
+
 ```{r Tidybiology}
 library(tidybiology)
-colnames(chromosome) 
+#colnames(chromosome) 
 chromosome %>% select(c("variations", "protein_codinggenes", "mi_rna")) %>%
-  summarise_all(.funs = list(mean = mean, median = median, max = max),
+  summarise_all(.funs = list(mean = ~round(mean(.x)), median = median, max = max),
                 .names = "{.col}.{.fn}") %>%
   gather(key = "statistics") %>%
   kbl() %>%
   kable_styling()
 ```
+
+2.  How does the chromosome size distribute? Plot a graph that helps to visualize this by using ggplot2 package functions.
 
 ```{r chromosome size distribution}
 p <- ggplot(chromosome, aes(x = id, y = length_mm)) + 
@@ -302,6 +332,8 @@ p <- ggplot(chromosome, aes(x = id, y = length_mm)) +
   geom_text(aes(label = length_mm), vjust = 1.6, color = "white", size = 3)
 set_style(p)
 ```
+
+3.  Does the number of protein coding genes or miRNAs correlate with the length of the chromosome? Make two separate plots to visualize these relationships.
 
 ```{r length genes miRNA}
 #| layout-nrow: 1
@@ -316,6 +348,8 @@ p2 <- ggplot(chromosome, aes(x = length_mm, y = mi_rna)) +
   geom_point() 
 set_style(p2)
 ```
+
+4.  Calculate the same summary statistics for the 'proteins' data variables length and mass. Create a meaningful visualization of the relationship between these two variables by utilizing the ggplot2 package functions. Play with the colors, theme- and other visualization parameters to create a plot that pleases you.
 
 ```{r proteins}
 #| layout-nrow: 1
