@@ -15,11 +15,15 @@ Literature: Unbiased integration of single cell transcriptome replicates, Loza e
 
 1.  What is the medically relevant insight from the article?
 
-    This is a computational paper that deals with the horizontal integration of single-cell transcriptome data where there are multiple replicates measuring the same features, which potentially contains batch effect. This paper aims to correct the batch effect that is present and assumed to be orthogonal to the biological effect.
+    This is a computational paper that is focused on horizontal integration of single-cell transcriptome data where there are multiple replicates measuring the same features, which potentially leads to the presence of batch effect. This paper aims to correct this batch effect that is assumed to be almost orthogonal to and smaller than the biological effect and thus fulfilling the integration of the replicates.
 
 2.  Which genomics technology/technologies were used?
 
     Single-cell RNA-sequencing
+
+3.  Further related research questions:
+
+    In the paper, MNN pairs were determined by e.g. finding k-closest cells in the query batch for every cell in the ref. batch, then k-closest cells in the ref. batch were found for every cell in the query batch, then intersections of these pairs were selected as the MNN pairs. I read it from the paper that here k is set to 30. I wonder here the number 30(parameter k) represents, in a way, an assumption for the heterogeneity of the cell populations. For example, if a cell population is more homogeneous, we want the k to be larger whereas if more heterogeneous, k smaller. So in this way, I wonder if we could set k as a hyperparameter, and let some resulting metrics to pick an optimal k for the given datasets.
 
 ```{r setup}
 #| echo: fenced
