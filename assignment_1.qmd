@@ -9,6 +9,18 @@ format:
 editor: visual
 ---
 
+## Task 1
+
+Literature: Unbiased integration of single cell transcriptome replicates, Loza et al.
+
+1.  What is the medically relevant insight from the article?
+
+    This is a computational paper that deals with the horizontal integration of single-cell transcriptome data where there are multiple replicates measuring the same features, which potentially contains batch effect. This paper aims to correct the batch effect that is present and assumed to be orthogonal to the biological effect.
+
+2.  Which genomics technology/technologies were used?
+
+    Single-cell RNA-sequencing
+
 ```{r setup}
 #| echo: fenced
 #| message: false
@@ -304,8 +316,8 @@ From the above plots I noticed the following:
 
 1.  From the boxplot, plants from Quebec have a higher CO~2~ uptake rate than Mississippi, whether they were chilled or not before the measurement.
 2.  Comparing the treatments, chilling decreases the CO~2~ uptake rate in general.
-3.  From the second and the third plot, we can learn the relationship between ambient CO~2~ level(conc) and the CO~2~ uptake rate of the plants. This relationship of the plants demonstates a similar trend, i.e. CO~2~ uptake rate increases as the level of conc increases, with a deceasing rate of change, and eventually reaches a plateau.
-4.  Whether or not chilled before measurement affects(decreases the uptake rate) the plants from Mississippi more than Quebec.
+3.  From the second and the third plot, we can learn about the relationship between ambient CO~2~ level(conc) and the CO~2~ uptake rate of the plants. This relationship demonstrates a non-linear, monotonically increasing trend until it reaches a plateau, i.e. CO~2~ uptake rate increases as the level of conc increases, with a deceasing rate of change, and eventually reaches a plateau.
+4.  Whether or not having chilled before measurement affects(decreases the uptake rate) the plants from Mississippi more than Quebec.
 
 # Task 8
 
